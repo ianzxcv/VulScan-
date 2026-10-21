@@ -12,7 +12,10 @@ def run_nmap_scan(target_ip):
     )
 
     if result.returncode == 0:
-        print(result.stdout)
+        print("Nmap scan completed!")
+        return result.stdout
+
     else:
         print("---Nmap scan has failed!---")
-        print(result.stderr) 
+        print(result.stderr)
+        return None
