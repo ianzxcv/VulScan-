@@ -2,7 +2,10 @@ import ipaddress
 import subprocess
 
 from scanner import run_nmap_scan
+
 from parser import extract_open_ports
+
+from checks import check_open_ports
 
 
 def get_target_ip():
@@ -72,6 +75,20 @@ def main():
                 print(f"Product: {port['product']}")
                 print(f"Version: {port['version']}")
                 print("-" * 45)
+
+                findings= check_open_ports(open_ports)
+
+                print("\nSECURITY FINDINGS")   
+                print("=" * 45)
+                if findings:
+                    for finding in findings:
+                        print(f"Finding: {finding['title']}")
+                        print(f"Severity: {finding['severity']}")
+                        print(f"Evidence: {finding['evidence']}")
+                        print(f"Recommendation: {finding['recommendation']}")
+                        print("-" * 45)
+                else:
+                    print("No security findings detected.")
         else:
             print("No open ports found.")
     else:
