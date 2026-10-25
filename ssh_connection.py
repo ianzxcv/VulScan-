@@ -2,6 +2,8 @@ import paramiko
 import getpass
 import json
 
+from ssh_checks import check_ssh_settings
+
 target_ip = "192.168.56.102"
 username = 'user'
 
@@ -26,17 +28,38 @@ try:
 
     output = stdout.read().decode().strip()
     error_output = stderr.read().decode().strip()
-   # print("Ubuntu Hostname:", hostname )
-
-    if output:
-        print("\nSSH AUDIT RESULTS")    
-        print("=" * 40)
-        print(output)
 
     if error_output:
             print("\nREMOTE ERROR!")    
             print("=" * 40)
             print(error_output)
+
+    if not output:
+        raise RuntimeError("The SSH Audit returned no output")
+
+    ssh_settings = json.loads(output)
+
+    print("\nSSH Configuration")
+    print("=" * 40)
+
+    for setting, value in ssh_settings.items():
+        print(f"{setting}:{value}")
+
+    findings = check_ssh_settings(ssh_settings)
+
+    print("\nSSH SECURITY FINDINGS")
+    print("=" * 40)
+    
+    if findings: 
+        for finding in findings:
+            print("Finding:", finding["title"])
+            print("Severity:", finding["severity"])
+            print("Evidence", finding["evidence"])
+            print("Recommendation:", finding["recommendation"])
+            print("-" * 40)
+
+    else:
+         print("No Security Findings.")
 
 except Exception as error:
     print("SSH connection failed.")
