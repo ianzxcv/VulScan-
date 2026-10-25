@@ -2,11 +2,10 @@ import ipaddress
 import subprocess
 
 from scanner import run_nmap_scan
-
 from parser import extract_open_ports
-
 from checks import check_open_ports
-
+from ssh_connection import run_ssh_audit
+from reporter import display_scan_results, display_ssh_settings, display_findings
 
 def get_target_ip():
     while True:
@@ -63,36 +62,40 @@ def main():
     if xml_data is not None:
         # Extract information about open ports
         open_ports = extract_open_ports(xml_data)
-
-        print("\n" + "=" * 45)
-        print("RESULTS")
-        print("=" * 45)
-
-        if open_ports:
-            for port in open_ports:
-                print(f"Port: {port['port']}/{port['protocol']}")
-                print(f"Service: {port['service']}")
-                print(f"Product: {port['product']}")
-                print(f"Version: {port['version']}")
-                print("-" * 45)
-
-                findings= check_open_ports(open_ports)
-
-                print("\nSECURITY FINDINGS")   
-                print("=" * 45)
-                if findings:
-                    for finding in findings:
-                        print(f"Finding: {finding['title']}")
-                        print(f"Severity: {finding['severity']}")
-                        print(f"Evidence: {finding['evidence']}")
-                        print(f"Recommendation: {finding['recommendation']}")
-                        print("-" * 45)
-                else:
-                    print("No security findings detected.")
-        else:
-            print("No open ports found.")
+        display_scan_results(open_ports)
+        port_findings =check_open_ports(open_ports)
+        display_findings(port_findings)
+        
     else:
         print("Unable to retrieve scan results.")
+
+    # Run SSH audit for the target
+    if target_ip == "192.168.56.102" and xml_data is not None:
+        ssh_is_open = any(
+            port["port"] == "22"
+            and port["protocol"] == "tcp"
+            and port["service"] == "ssh"
+            for port in open_ports
+        )
+
+        if ssh_is_open:
+            print("\nSSH CONFIGURATION AUDIT")
+            print("=" * 45)
+
+            try:
+                ssh_settings, ssh_findings = run_ssh_audit(target_ip)
+
+                display_ssh_settings(ssh_settings)
+
+                display_findings(ssh_findings,"SSH SECURITY FINDINGS")
+
+            except Exception as error:
+                print("SSH audit failed.")
+                print(error)
+        else:
+            print("SSH audit skipped: SSH service was not detected.")
+    elif target_ip =="192.168.56.102":
+        print("SSH audit skipped: Nmap could not complete the scan succcessfully.")
 
 
 if __name__ == "__main__":
