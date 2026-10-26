@@ -60,11 +60,16 @@ def main():
     xml_data = run_nmap_scan(target_ip)
 
     if xml_data is not None:
-        # Extract information about open ports
+        # Extract information on open ports
         open_ports = extract_open_ports(xml_data)
-        display_scan_results(open_ports)
-        port_findings =check_open_ports(open_ports)
-        display_findings(port_findings)
+
+        if open_ports is not None:
+
+            display_scan_results(open_ports)
+
+            port_findings =check_open_ports(open_ports)
+            
+            display_findings(port_findings)
         
     else:
         print("Unable to retrieve scan results.")

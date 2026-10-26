@@ -1,6 +1,11 @@
 def check_ssh_settings(ssh_settings):
     findings = []
 
+    ssh_settings = {
+        setting.lower(): str(value).strip().lower()
+        for setting, value in ssh_settings.items()
+}
+
     # Check 1: Password authentication
     if ssh_settings.get("passwordauthentication") == "yes":
         findings.append({
@@ -15,7 +20,7 @@ def check_ssh_settings(ssh_settings):
 
     # Check 2: Maximum authentication attempts
     try:
-        max_attempts = int(ssh_settings.get("maxauthtries", 0))
+        max_attempts = int(ssh_settings["maxauthtries"])
 
         if max_attempts > 4:
             findings.append({
@@ -30,7 +35,7 @@ def check_ssh_settings(ssh_settings):
                 )
             })
 
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, KeyError):
         findings.append({
             "title": "Unable to evaluate SSH authentication limit",
             "severity": "Informational",

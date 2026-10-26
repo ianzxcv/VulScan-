@@ -5,6 +5,17 @@ def extract_open_ports(xml_data):
 
     open_ports = []
 
+    try:
+        root = ET.fromstring(xml_data)
+    except ET.ParseError:
+        print("ERROR: Unable to read Nmap XML output.")
+        print("The scan results may be incomplete or invalid.")
+        return None
+
+    if root.tag != "nmaprun":
+        print("ERROR: The XML data is not a valid Nmap scan result.")
+        return None
+
     for port in root.findall(".//port"):
         state = port.find("state")
 

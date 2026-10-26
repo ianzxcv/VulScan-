@@ -1,20 +1,27 @@
 
 def check_open_ports(open_ports):
     findings = []
-
+    
     for port in open_ports:
-        port_number = int(port["port"])
-        service_name = port["service"]
+        port_number = port.get("port")
+        protocol = port.get("protocol", "unknown")
+        service_name = port.get("service", "unknown")
 
-        if port_number == 23:
+        try:
+             port_number = int(port_number)
+        except(ValueError, TypeError):
+             continue
+        
+        if port_number == 23 and protocol == "tcp":
             findings.append({
-                "title": "Telnet service detected",
+                "title": "Potential Telnet service detected",
                 "severity": "High",
                 "evidence": (
-                    "Port 23 is open and the detected service is "
+                    "TCP Port 23 is open. Detected service: "
                     + service_name
                 ),
                 "recommendation": (
+                    "Verify whether Telnet is running "
                     "Disable Telnet if it is not required. "
                     "Use SSH for secure remote access."
                 )
@@ -31,9 +38,16 @@ if __name__ == "__main__":
             "service": "telnet",
             "product": "unknown",
             "version": "unknown"
+        },
+        {
+            "port": "22",
+            "protocol": "tcp",
+            "service": "ssh",
+            "product": "OpenSSH",
+            "version": "10.2"
         }
     ]
-
+        
     findings = check_open_ports(test_ports)
 
     if findings:
