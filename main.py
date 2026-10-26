@@ -84,7 +84,9 @@ def main():
         )
 
         if ssh_is_open:
-            print("\nSSH CONFIGURATION AUDIT")
+            print("\n")
+            print("=" * 45)
+            print("SSH CONFIGURATION AUDIT")
             print("=" * 45)
 
             try:

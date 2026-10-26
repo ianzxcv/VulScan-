@@ -83,3 +83,28 @@ def check_ssh_settings(ssh_settings):
         })
 
     return findings
+
+#test
+"""" 
+if __name__ == "__main__":
+    test_settings = {
+        "passwordauthentication" : "yes",
+        "maxauthtries" : "6",
+        "permitrootlogin" : "prohibit-password",
+        "permitemptypasswords": "no",
+        "pubkeyauthentication": "yes"
+    }
+
+    findings = check_ssh_settings(test_settings)
+
+    if findings:
+        for finding in findings:
+            print("Finding:", finding["title"])
+            print("Severity:", finding["severity"])
+            print("Evidence:", finding["evidence"])
+            print("Recommendation:", finding["recommendation"])
+            print("-" * 45)
+    else:
+        print("No security findings detected.")
+"""
+

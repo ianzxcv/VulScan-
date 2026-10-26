@@ -27,24 +27,61 @@ def check_open_ports(open_ports):
                 )
             })
 
+        if port_number == 21 and protocol == "tcp":
+            findings.append({
+                    "title": "Potential unencrypted FTP exposure.",
+                    "severity": "Medium",
+                    "evidence": (
+                    "TCP Port 21 is open. Detected service: "
+                    + service_name
+                 ),
+                "recommendation": (
+                    "Verify whether FTP is required. "
+                    "Prefer SFTP or appropriately configured. "
+                    "FTPS for secure file transfer."
+                )
+            })
+
+        if port_number == 80 and protocol == "tcp" and service_name=="http":
+            findings.append({
+                    "title": "HTTP service detected",
+                    "severity": "Low",
+                    "evidence": (
+                        "TCP Port 80 is open. Detected service: "
+                        + service_name
+                     ),
+                    "recommendation": (
+                        "Verify whether sensitive information is transmitted over HTTP. Use HTTPS where encryption is required. "
+                    )
+                })
+
     return findings
 
 
 if __name__ == "__main__":
     test_ports = [
         {
+            "port": "21",
+            "protocol": "tcp",
+            "service": "ftp",
+            "product": "unknown",
+            "version": "unknown"
+        },
+
+        {
             "port": "23",
             "protocol": "tcp",
             "service": "telnet",
             "product": "unknown",
             "version": "unknown"
-        },
+                },
+
         {
-            "port": "22",
+            "port": "80",
             "protocol": "tcp",
-            "service": "ssh",
-            "product": "OpenSSH",
-            "version": "10.2"
+            "service": "http",
+            "product": "unknown",
+            "version": "unknown"
         }
     ]
         
